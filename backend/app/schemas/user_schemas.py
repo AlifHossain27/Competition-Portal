@@ -15,7 +15,6 @@ class UserBase(BaseModel):
     email: EmailStr
     name: str
     university_id: str | None = None
-    role: UserRoleEnum = UserRoleEnum.regular
 
 
 
@@ -30,7 +29,7 @@ class UserUpdate(BaseModel):
     name: str | None = None
     email: EmailStr | None = None
     university_id: str | None = None
-    role: UserRoleEnum | None = None
+    role: UserRoleEnum | str | None = None
 
 
 class UserSchema(UserBase):

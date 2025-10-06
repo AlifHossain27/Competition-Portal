@@ -4,6 +4,10 @@ from sqlalchemy.orm import relationship
 import uuid
 import enum
 from app.db.database import Base
+from app.models.club_model import Club
+from app.models.form_model import Form
+from app.models.registration_model import Registration
+from app.models.team_model import Team
 
 class EventStatusEnum(str, enum.Enum):
     draft = "draft"
