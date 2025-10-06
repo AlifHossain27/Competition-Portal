@@ -34,6 +34,7 @@ class UserUpdate(BaseModel):
 
 class UserSchema(UserBase):
     id: UUID
+    role: UserRoleEnum | str
     created_at: datetime
     updated_at: datetime
 

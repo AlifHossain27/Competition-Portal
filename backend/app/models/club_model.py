@@ -20,7 +20,7 @@ class Club(Base):
     logo_url = Column(String, nullable=True)
     banner_url = Column(String, nullable=True)
     website = Column(String, nullable=True)
-    status = Column(Enum(ClubStatusEnum), default=ClubStatusEnum.pending, nullable=False)
+    status = Column(Enum(ClubStatusEnum), default=ClubStatusEnum.pending, nullable=True)
     created_by = Column(UUID(as_uuid=True), ForeignKey("users.id"))
     approved_by = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
