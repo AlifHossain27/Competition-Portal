@@ -170,21 +170,6 @@ def logout_user(response: Response):
         httponly=True
     )
 
-# Approve or reject a club
-def approve_club(current_user:TokenData, db: Session, club_id: int, status: str):
-    uuid = current_user.get_id()
-    user = get_user_by_uuid(uuid=uuid, db=db)
-    if user.role == UserRoleEnum.admin:
-        club = db.query(Club).filter(Club.id == club_id).first()
-        if not club:
-            return None
-        club.status = status  # "approved" or "rejected"
-        db.commit()
-        db.refresh(club)
-        return club
-    else:
-        raise UnauthorizedException("Admin user required")
-
 # List all users
 def list_users(current_user:TokenData, db: Session) -> list[UserSchema]:
     uuid = current_user.get_id()

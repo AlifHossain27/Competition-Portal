@@ -5,11 +5,10 @@ from uuid import UUID
 from app.models.club_model import Club, ClubStatusEnum
 from app.models.user_model import User, UserRoleEnum
 from app.schemas.club_schemas import ClubCreate, ClubSchema
-from app.schemas.user_schemas import Token, TokenData
+from app.schemas.user_schemas import TokenData
 from app.services.user_service import (
     get_user_by_uuid,
-    CurrentUser,
-    approve_club
+    CurrentUser
 )
 from app.exceptions.handler import (
     UnauthorizedException,
@@ -19,7 +18,11 @@ from app.exceptions.handler import (
 )
 
 
-def create_club(current_user:CurrentUser, db: Session, payload: ClubCreate) -> ClubSchema:
+def create_club(current_user:TokenData, db: Session, payload: ClubCreate) -> ClubSchema:
+    user_club = db.query(Club).filter(Club.created_by == current_user.get_id()).first()
+    if user_club is not None:
+        raise ConflictException("User already has a club")
+    
     club = Club(
         name=payload.name,
         slug=payload.slug,
@@ -36,7 +39,10 @@ def create_club(current_user:CurrentUser, db: Session, payload: ClubCreate) -> C
 
 
 def get_club(db: Session, club_id: UUID) -> ClubSchema:
-    return db.query(Club).filter(Club.id == club_id).first()
+    club = db.query(Club).filter(Club.id == club_id).first()
+    if not club:
+        raise NotFoundException(f"Club with id {club_id} not found")
+    return club
 
 
 def list_active_clubs(db: Session, skip: int = 0, limit: int = None) -> List[ClubSchema]:
@@ -47,6 +53,13 @@ def list_pending_clubs(current_user:TokenData, db: Session, skip: int = 0, limit
     user = get_user_by_uuid(uuid=current_user.get_id(), db=db)
     if user.role == UserRoleEnum.admin:
         return db.query(Club).filter(Club.status == ClubStatusEnum.pending).offset(skip).limit(limit).all()
+    else:
+        raise UnauthorizedException("Admin user required")
+    
+def get_all_club(current_user:TokenData, db: Session, skip: int = 0, limit: int = None) -> List[ClubSchema]:
+    user = get_user_by_uuid(uuid=current_user.get_id(), db=db)
+    if user.role == UserRoleEnum.admin:
+        return db.query(Club).offset(skip).limit(limit).all()
     else:
         raise UnauthorizedException("Admin user required")
 
@@ -90,7 +103,7 @@ def update_club(current_user:TokenData, club_id: UUID, updated_attributes: ClubC
     if club is None:
         raise NotFoundException(f"Club with id {club_id} not found")
     if club.created_by != user.id:
-        raise UnauthorizedException
+        raise UnauthorizedException("You are not the creator of this club")
     club.name = updated_attributes.name
     club.slug = updated_attributes.slug
     club.description = updated_attributes.description
@@ -110,6 +123,6 @@ def delete_club(current_user:TokenData, db: Session, club_id: UUID) -> None:
     if club is None:
         raise NotFoundException(f"Club with id {club_id} not found")
     if club.created_by != user.id:
-        raise UnauthorizedException
+        raise UnauthorizedException("You are not the creator of this club")
     db.delete(club)
     db.commit()

@@ -1,4 +1,4 @@
-from pydantic import BaseModel, HttpUrl, ConfigDict
+from pydantic import BaseModel, ConfigDict
 from uuid import UUID
 from datetime import datetime
 from enum import Enum
@@ -18,22 +18,23 @@ class EventBase(BaseModel):
     slug: str
     type: str | None = None
     description: str | None = None
-    poster_url: HttpUrl | None = None
+    poster_url: str | None = None
     start_time: datetime
     end_time: datetime
     registration_deadline: datetime | None = None
     location: str | None = None
     max_participants: int | None = None
-    status: EventStatusEnum = EventStatusEnum.draft
+    
 
 class EventCreate(EventBase):
-    club_id: UUID
+    pass
 
 class EventSchema(EventBase):
     id: UUID
     club_id: UUID
     created_at: datetime
     updated_at: datetime
+    status: EventStatusEnum = EventStatusEnum.draft
     forms: List[FormSchema] = []
 
     model_config = ConfigDict(from_attributes=True)
@@ -43,6 +44,7 @@ class EventModelSchema(EventBase):
     club_id: UUID
     created_at: datetime
     updated_at: datetime
+    status: EventStatusEnum = EventStatusEnum.draft
     forms: List[FormResponseModelSchema] = []
     registrations: List[RegistrationSchema] = []
     teams: List[TeamSchema] = []

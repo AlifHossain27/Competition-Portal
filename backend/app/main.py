@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routers import user_router, club_router
+from app.routers import user_router, club_router, event_router
 from app.db.database import Base, engine
 
 app = FastAPI(
@@ -27,3 +27,4 @@ Base.metadata.create_all(bind=engine)
 
 app.include_router(user_router.user_router, prefix="/api", tags=["Users"])
 app.include_router(club_router.club_router, prefix="/api", tags=["Clubs"])
+app.include_router(event_router.event_router, prefix="/api", tags=["Events"])
