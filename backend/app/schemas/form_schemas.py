@@ -1,6 +1,7 @@
 from pydantic import BaseModel, ConfigDict
 from uuid import UUID
 from datetime import datetime
+from enum import Enum
 from typing import List
 
 class FormResponseBase(BaseModel):
@@ -16,17 +17,24 @@ class FormResponseSchema(FormResponseBase):
 
     model_config = ConfigDict(from_attributes=True)
 
+class FormStatusEnum(str, Enum):
+    draft = "draft"
+    published = "published"
+    closed = "closed"
+
+
 class FormBase(BaseModel):
     title: str
     instructions: str | None = None
     form_content: str | None = None
 
 class FormCreate(FormBase):
-    event_id: UUID
+    pass
 
 class FormSchema(FormBase):
     id: UUID
     event_id: UUID
+    status: FormStatusEnum = FormStatusEnum.draft
     created_at: datetime
     updated_at: datetime
 
@@ -35,6 +43,7 @@ class FormSchema(FormBase):
 class FormResponseModelSchema(FormBase):
     id: UUID
     event_id: UUID
+    status: FormStatusEnum = FormStatusEnum.draft
     created_at: datetime
     updated_at: datetime
     responses: List[FormResponseSchema] = []

@@ -1,5 +1,6 @@
 from typing import List
 from uuid import UUID
+from datetime import datetime, timedelta, timezone
 from sqlalchemy.orm import Session
 from app.models.event_model import Event, EventStatusEnum
 from app.models.club_model import Club, ClubStatusEnum
@@ -127,6 +128,7 @@ def update_event(current_user: TokenData, db: Session, club_id:UUID, event_id: U
     event.registration_deadline = data.registration_deadline
     event.location = data.location
     event.max_participants = data.max_participants
+    event.updated_at = datetime.now(tz = timezone.utc)
     
     db.commit()
     db.refresh(event)
@@ -141,8 +143,6 @@ def delete_event(current_user: TokenData, db: Session, club_id: UUID, event_id: 
     if event.club_id != club.id:
         raise NotFoundException(f"Event with id {event_id} not found in club with id {club_id}")
     
-
-    club = db.query(Club).filter(Club.id == event.club_id).first()
     if club.created_by != current_user.get_id():
         raise ForbiddenException("You can not delete this event. You are not the owner of the club.")
 

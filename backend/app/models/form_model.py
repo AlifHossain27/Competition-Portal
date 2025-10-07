@@ -1,8 +1,14 @@
-from sqlalchemy import Column, String, Text, ForeignKey, DateTime, func
+from sqlalchemy import Column, String, Text, ForeignKey, DateTime, func, Enum
 from sqlalchemy.dialects.postgresql import UUID
+import enum
 from sqlalchemy.orm import relationship
 import uuid
 from app.db.database import Base
+
+class FormStatusEnum(str, enum.Enum):
+    draft = "draft"
+    published = "published"
+    closed = "closed"
 
 class Form(Base):
     __tablename__ = "forms"
@@ -12,6 +18,7 @@ class Form(Base):
     title = Column(String, nullable=False)
     instructions = Column(Text, nullable=True)
     form_content = Column(Text, nullable=True)
+    status = Column(Enum(FormStatusEnum), default=FormStatusEnum.draft, nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
 
