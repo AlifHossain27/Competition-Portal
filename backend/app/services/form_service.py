@@ -18,6 +18,8 @@ from app.exceptions.handler import (
 def create_form(current_user: TokenData, db: Session, form_data: FormCreate, event_id: UUID, club_id: UUID) -> FormSchema:
     club = db.query(Club).filter(Club.id == club_id).first()
     event = db.query(Event).filter(Event.id == event_id).first()
+    if not club:
+        raise NotFoundException(f"Club with id {club_id} not found")
     if not event:
         raise NotFoundException(f"Event with id {event_id} not found")
     if event.club_id != club.id:

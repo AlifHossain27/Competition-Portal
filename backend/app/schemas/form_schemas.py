@@ -1,14 +1,18 @@
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, EmailStr, ConfigDict
 from uuid import UUID
 from datetime import datetime
 from enum import Enum
 from typing import List
+from app.schemas.team_schemas import TeamMemberCreate
 
 class FormResponseBase(BaseModel):
     response_content: str
 
 class FormResponseCreate(FormResponseBase):
-    form_id: UUID
+    team_name: str
+    leader_name: str
+    leader_email: EmailStr
+    members: List[TeamMemberCreate]
 
 class FormResponseSchema(FormResponseBase):
     id: UUID

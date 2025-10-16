@@ -91,7 +91,7 @@ async def update_existing_form(club_id: UUID, event_id: UUID, form_id: UUID, for
     except Exception as e:
         raise e
 
-@form_router.delete("/club/{club_id}/event/{event_id}/form/{form_id}", response_model=FormSchema, status_code=204)
+@form_router.delete("/club/{club_id}/event/{event_id}/form/{form_id}", status_code=204)
 async def remove_form(club_id: UUID, event_id: UUID, form_id: UUID, db: Session = Depends(get_db), current_user: TokenData = Depends(get_current_user)):
     try:
         return delete_form(db, current_user, club_id, event_id, form_id)

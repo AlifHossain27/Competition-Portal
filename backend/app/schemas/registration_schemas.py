@@ -2,6 +2,8 @@ from pydantic import BaseModel, ConfigDict
 from uuid import UUID
 from datetime import datetime
 from enum import Enum
+from app.schemas.team_schemas import TeamSchema
+from app.schemas.form_schemas import FormResponseSchema
 
 class RegistrationStatusEnum(str, Enum):
     pending = "pending"
@@ -26,8 +28,8 @@ class RegistrationCreate(RegistrationBase):
 class RegistrationSchema(RegistrationBase):
     id: UUID
     event_id: UUID
-    form_response_id: UUID
-    team_id: UUID
     registered_at: datetime
+    form_response: FormResponseSchema
+    team: TeamSchema
 
     model_config = ConfigDict(from_attributes=True)

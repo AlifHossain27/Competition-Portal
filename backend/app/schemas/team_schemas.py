@@ -9,7 +9,7 @@ class TeamMemberBase(BaseModel):
     member_student_id: str | None = None
 
 class TeamMemberCreate(TeamMemberBase):
-    team_id: UUID
+    team_id: UUID | None = None
 
 class TeamMemberSchema(TeamMemberBase):
     id: UUID
