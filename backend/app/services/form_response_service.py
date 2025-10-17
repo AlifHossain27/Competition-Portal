@@ -8,7 +8,7 @@ from app.models.form_model import Form, FormResponse
 from app.models.team_model import Team, TeamMember
 from app.models.registration_model import Registration, RegistrationStatusEnum, PaymentStatusEnum
 from app.schemas.form_schemas import FormResponseCreate, FormResponseSchema, FormStatusEnum
-from app.schemas.registration_schemas import RegistrationSchema
+from app.schemas.registration_schemas import RegistrationFullSchema
 from app.schemas.user_schemas import TokenData
 from app.exceptions.handler import (
     UnauthorizedException,
@@ -18,7 +18,7 @@ from app.exceptions.handler import (
     ForbiddenException
 )
 
-def create_form_response(db: Session, response_data: FormResponseCreate, form_id: UUID, event_id: UUID, club_id: UUID) -> RegistrationSchema:
+def create_form_response(db: Session, response_data: FormResponseCreate, form_id: UUID, event_id: UUID, club_id: UUID) -> RegistrationFullSchema:
     form = db.query(Form).filter(Form.id == form_id).first()
 
     if not form:

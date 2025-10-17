@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from uuid import UUID
 from app.schemas.form_schemas import FormResponseCreate, FormResponseSchema
-from app.schemas.registration_schemas import RegistrationSchema
+from app.schemas.registration_schemas import RegistrationFullSchema
 from app.schemas.user_schemas import TokenData
 from app.services.form_response_service import (
     create_form_response,
@@ -21,7 +21,7 @@ from app.exceptions.handler import (
 
 form_response_router = APIRouter()
 
-@form_response_router.post("/club/{club_id}/event/{event_id}/form/{form_id}/form-response/create", response_model=RegistrationSchema, status_code=201)
+@form_response_router.post("/club/{club_id}/event/{event_id}/form/{form_id}/form-response/create", response_model=RegistrationFullSchema, status_code=201)
 async def create_new_form_response_router( form_id: UUID, club_id: UUID, event_id: UUID, response_data: FormResponseCreate, db: Session = Depends(get_db)):
     try:
         return create_form_response(db, response_data, form_id, event_id, club_id)

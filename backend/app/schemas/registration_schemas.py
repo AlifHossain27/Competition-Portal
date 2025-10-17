@@ -28,6 +28,15 @@ class RegistrationCreate(RegistrationBase):
 class RegistrationSchema(RegistrationBase):
     id: UUID
     event_id: UUID
+    form_response_id: UUID
+    team_id: UUID
+    registered_at: datetime
+
+    model_config = ConfigDict(from_attributes=True)
+
+class RegistrationFullSchema(RegistrationBase):
+    id: UUID
+    event_id: UUID
     registered_at: datetime
     form_response: FormResponseSchema
     team: TeamSchema
