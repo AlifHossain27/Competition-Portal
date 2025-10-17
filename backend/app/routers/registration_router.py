@@ -61,7 +61,7 @@ async def cancel_registration_router(club_id: UUID, event_id: UUID, registration
         raise e
     
 @registration_router.patch("/club/{club_id}/event/{event_id}/registrations/{registration_id}/payment/{payment_status}", response_model=RegistrationSchema, status_code=201)
-async def update_registration_payment_router(club_id: UUID, event_id: UUID, registration_id: UUID, payment_status: PaymentStatusEnum,db: Session = Depends(get_db), current_user: TokenData = Depends(get_current_user)):
+async def update_registration_payment_router(club_id: UUID, event_id: UUID, registration_id: UUID, payment_status: str,db: Session = Depends(get_db), current_user: TokenData = Depends(get_current_user)):
     try:
         return update_payment_status(current_user=current_user, db=db, club_id=club_id, event_id=event_id, registration_id=registration_id, payment_status=payment_status)
     except (NotFoundException, ConflictException, BadRequestException) as error:

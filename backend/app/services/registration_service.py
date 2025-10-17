@@ -80,6 +80,8 @@ def update_payment_status(current_user: TokenData, db: Session, club_id: UUID, e
 
     if payment_status == "paid":
         registration.payment_status = PaymentStatusEnum.paid
+        ts = int(datetime.now(timezone.utc).timestamp())
+        registration.ticket_code = f"TICKET-{registration.id}-{ts}"
     elif payment_status == "unpaid":
         registration.payment_status = PaymentStatusEnum.unpaid
     elif payment_status == "refunded":
