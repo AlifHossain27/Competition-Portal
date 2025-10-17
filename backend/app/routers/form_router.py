@@ -29,7 +29,7 @@ from app.exceptions.handler import (
 form_router = APIRouter()
 
 @form_router.post("/club/{club_id}/event/{event_id}/form/create", response_model=FormSchema, status_code=201)
-def create_new_form( club_id: UUID, event_id: UUID, form_data: FormCreate, db: Session = Depends(get_db), current_user: TokenData = Depends(get_current_user)):
+async def create_new_form( club_id: UUID, event_id: UUID, form_data: FormCreate, db: Session = Depends(get_db), current_user: TokenData = Depends(get_current_user)):
     try:
         return create_form(current_user, db, form_data, event_id, club_id)
     except (NotFoundException, ConflictException, BadRequestException) as error:

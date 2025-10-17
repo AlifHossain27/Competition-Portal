@@ -89,3 +89,34 @@ def create_form_response(db: Session, response_data: FormResponseCreate, form_id
     registration.form_response = form_response
 
     return registration
+
+def list_form_responses(current_user: TokenData, db: Session, club_id: UUID, event_id: UUID, form_id: UUID) -> list[FormResponseSchema]:
+    event = db.query(Event).filter(Event.id == event_id, Event.club_id == club_id).first()
+    if not event:
+        raise NotFoundException("Event not found or not part of this club")
+    
+    club = db.query(Club).filter(Club.id == club_id).first()
+    if club.created_by != current_user.get_id():
+        raise UnauthorizedException
+
+    responses = db.query(FormResponse).filter(FormResponse.form_id == form_id).all()
+    return responses
+
+def get_form_response(current_user: TokenData, db: Session, club_id: UUID, event_id: UUID, form_id: UUID, response_id: UUID) -> FormResponseSchema:
+    event = db.query(Event).filter(Event.id == event_id, Event.club_id == club_id).first()
+    if not event:
+        raise NotFoundException("Event not found or not part of this club")
+    
+    club = db.query(Club).filter(Club.id == club_id).first()
+    if club.created_by != current_user.get_id():
+        raise UnauthorizedException
+
+    response = db.query(FormResponse).filter(
+        FormResponse.id == response_id,
+        FormResponse.form_id == form_id
+    ).first()
+
+    if not response:
+        raise NotFoundException("Form response not found")
+
+    return response
