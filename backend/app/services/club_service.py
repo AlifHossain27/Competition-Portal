@@ -73,6 +73,7 @@ def approve_club(current_user:TokenData, db: Session, club_id: UUID):
             return None
         club.status = ClubStatusEnum.active
         club.approved_by = user.id
+        user.role = UserRoleEnum.club
         db.commit()
         db.refresh(club)
         return club
