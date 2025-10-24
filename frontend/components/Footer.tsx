@@ -10,16 +10,16 @@ const Footer = () => {
                     <div className="space-y-4 md:col-span-1">
                         <Link href="/" className="flex items-center gap-2">
                             <Bot className="h-8 w-8 text-primary" />
-                            <span className="text-2xl font-bold font-headline text-foreground">SyncUp</span>
+                            <span className="text-2xl font-bold font-headline text-foreground">Competation Portal</span>
                         </Link>
-                        <p className="text-muted-foreground text-sm">The newsletter of the University Computer Club.</p>
+                        <p className="text-muted-foreground text-sm">The Competation Portal for the University Clubs.</p>
                     </div>
                     <div className="md:col-span-2 grid grid-cols-2 sm:grid-cols-3 gap-8">
                         <div>
                             <h4 className="font-semibold mb-4 text-foreground">Quick Links</h4>
                             <ul className="space-y-2">
-                                <li><Link href="#content" className="text-sm text-muted-foreground hover:text-black transition-colors">Articles</Link></li>
-                                <li><Link href="#authors" className="text-sm text-muted-foreground hover:text-black transition-colors">Authors</Link></li>
+                                <li><Link href="#content" className="text-sm text-muted-foreground hover:text-black transition-colors">Events</Link></li>
+                                <li><Link href="#authors" className="text-sm text-muted-foreground hover:text-black transition-colors">Clubs</Link></li>
                                 <li><Link href="#contact" className="text-sm text-muted-foreground hover:text-black transition-colors">Contact</Link></li>
                             </ul>
                         </div>
