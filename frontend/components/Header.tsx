@@ -3,30 +3,23 @@
 import React from "react";
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from 'next/navigation'
+import { Button } from '@/components/ui/button';
 import { Menu, X } from "lucide-react";
- // adjust path if needed
+import { toast } from "sonner"
+import { useDispatch } from 'react-redux'
+import { AppDispatch, useAppSelector } from '@/redux/store'
+import { logIn, logOut } from '@/redux/features/auth-slice'
 
-// HoverUnderline Function
 
-interface HoverUnderlineProps {
-  text: string;
-}
-
-const HoverUnderline: React.FC<HoverUnderlineProps> = ({ text }) => {
-  return (
-    <p className="relative inline-block text-lg font-medium group cursor-pointer">
-      <span className="text-foreground/80 hover:text-foreground transition-colors duration-300 ">
-        {text}
-      </span>
-      <span
-        className="absolute left-0 bottom-[-3] h-[2px] w-0 bg-black transition-all duration-300 group-hover:w-full "
-      ></span>
-    </p>
-  );
-};
 
 
 export default function Header() {
+  const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL;
+  const router = useRouter()
+  const dispatch = useDispatch<AppDispatch>()
+  const isAuth = useAppSelector((state) => state.auth.value.isAuthenticated)
+
   const [isScrolled, setIsScrolled] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
 
@@ -37,13 +30,67 @@ export default function Header() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  const logout = async () => {
+    await fetch(`${API_BASE_URL}/api/auth/logout/`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+    })
+    toast("Logged out")
+    dispatch(logOut())
+    router.push('/')
+  }
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const resp = await fetch(`${API_BASE_URL}/api/user/me/`, {
+          method: 'GET',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+        })
+        const data = await resp.json();
+        console.log(data)
+        if (resp.ok) {
+          dispatch(logIn(data.role))
+        } else {
+          dispatch(logOut())
+        }
+      } catch {
+        console.log('connection failed')
+      }
+    })()
+  }, [dispatch, API_BASE_URL])
+
   const navLinks = [
     { href: "/", label: "Home" },
     { href: "/events", label: "Events" },
     { href: "/clubs", label: "Clubs" },
   ];
 
-  const navbarActive = isScrolled || isOpen; // blur if scrolled or menu open
+  const adminNavLinks = [
+    { href: "/", label: "Home" },
+    { href: "/events", label: "Events" },
+    { href: "/clubs", label: "Clubs" },
+    { href: "/dashboard", label: "Dashboard" },
+  ];
+
+  const regularNavLinks = [
+    { href: "/", label: "Home" },
+    { href: "/events", label: "Events" },
+    { href: "/clubs", label: "Clubs" },
+    { href: "/dashboard", label: "Dashboard" },
+  ];
+
+  const clubNavLinks = [
+    { href: "/", label: "Home" },
+    { href: "/events", label: "Events" },
+    { href: "/clubs", label: "Clubs" },
+    { href: "/dashboard", label: "Dashboard" },
+  ];
+
+  const navbarActive = isScrolled || isOpen;
+  const linksToShow = isAuth ? adminNavLinks : navLinks;
 
   return (
     <nav
@@ -54,18 +101,30 @@ export default function Header() {
       <div className="max-w-6xl mx-auto px-4">
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
-          <button className="text-xl font-bold text-black select-none">
-            Competation Portal
-          </button>
+          <Link href="/" className="flex items-center gap-2" >
+            <span className="text-xl font-bold font-headline text-foreground">Competition Portal</span>
+          </Link>
 
           {/* Desktop Links */}
-          <div className="hidden md:flex space-x-8 text-black font-medium">
-            {navLinks.map((link) => (
-              <Link key={link.href} href={link.href} className="group">
-                <HoverUnderline text={link.label} />
+          <div className="hidden md:flex ml-4 space-x-4">
+            {linksToShow.map((link) => (
+              <Link 
+                key={link.href} 
+                href={link.href}
+                className='text-foreground/80 hover:text-foreground text-sm font-medium p-2 relative group cursor-pointer'
+              >
+                {link.label}
+                <span className='absolute bottom-[-3px] left-0 w-full h-[2px] bg-black scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-300 ease-in-out z-10'></span>
               </Link>
             ))}
+            {isAuth && (
+              <Button variant="destructive" className="text-sm" onClick={logout}>
+                Logout
+              </Button>
+            )}
           </div>
+
+          
 
           {/* Mobile Button */}
           <button
@@ -82,16 +141,21 @@ export default function Header() {
       {isOpen && (
         <div className="md:hidden backdrop-blur-sm  shadow-md ">
           <div className="px-4 py-6 flex flex-col items-center space-y-4 text-black font-medium">
-            {navLinks.map((link) => (
+            {linksToShow.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
                 onClick={() => setIsOpen(false)}
                 className="block group text-center"
               >
-                <HoverUnderline text={link.label} />
+                {link.label}
               </Link>
             ))}
+            {isAuth && (
+              <Button variant="destructive" className="text-sm" onClick={logout}>
+                Logout
+              </Button>
+            )}
           </div>
         </div>
       )}

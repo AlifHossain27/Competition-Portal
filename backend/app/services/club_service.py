@@ -23,9 +23,13 @@ def create_club(current_user:TokenData, db: Session, payload: ClubCreate) -> Clu
     if user_club is not None:
         raise ConflictException("User already has a club")
     
+    existing_slug = db.query(Club).filter(Club.slug == payload.slug).first()
+    if existing_slug:
+        raise ConflictException(f"Slug '{payload.slug}' already exists")
+
     club = Club(
         name=payload.name,
-        slug=payload.slug,
+        slug=str(payload.slug).lower(),
         description=payload.description,
         logo_url=str(payload.logo_url) if payload.logo_url else None,
         banner_url=str(payload.banner_url) if payload.banner_url else None,
@@ -44,6 +48,11 @@ def get_club(db: Session, club_id: UUID) -> ClubSchema:
         raise NotFoundException(f"Club with id {club_id} not found")
     return club
 
+def get_club_by_slug(db: Session, slug: str) -> UUID:
+    club = db.query(Club).filter(Club.slug == slug).first()
+    if not club:
+        raise NotFoundException(f"Club with slug {slug} not found")
+    return club.id
 
 def list_active_clubs(db: Session, skip: int = 0, limit: int = None) -> List[ClubSchema]:
     return db.query(Club).filter(Club.status == ClubStatusEnum.active).offset(skip).limit(limit).all()
@@ -105,8 +114,12 @@ def update_club(current_user:TokenData, club_id: UUID, updated_attributes: ClubC
         raise NotFoundException(f"Club with id {club_id} not found")
     if club.created_by != user.id:
         raise UnauthorizedException("You are not the creator of this club")
+    if updated_attributes.slug != club.slug:
+        existing_slug = db.query(Club).filter(Club.slug == updated_attributes.slug).first()
+        if existing_slug:
+            raise ConflictException(f"Slug '{updated_attributes.slug}' already exists")
     club.name = updated_attributes.name
-    club.slug = updated_attributes.slug
+    club.slug = str(updated_attributes.slug).lower()
     club.description = updated_attributes.description
     club.logo_url = updated_attributes.logo_url
     club.banner_url = updated_attributes.banner_url

@@ -8,6 +8,7 @@ from app.schemas.club_schemas import ClubCreate, ClubSchema
 from app.services.club_service import (
     create_club,
     get_club,
+    get_club_by_slug,
     get_all_club,
     list_active_clubs,
     list_pending_clubs,
@@ -70,9 +71,10 @@ async def list_pending_club_router(current_user: TokenData = Depends(get_current
         raise e
 
 
-@club_router.get("/clubs/{club_id}", response_model=ClubSchema)
-async def get_club_router(club_id: UUID, db: Session = Depends(get_db)):
+@club_router.get("/clubs/{slug}", response_model=ClubSchema)
+async def get_club_router(slug: str, db: Session = Depends(get_db)):
     try:
+        club_id = get_club_by_slug(slug=slug, db=db)
         return get_club(db=db, club_id=club_id)
     except (NotFoundException, ConflictException, BadRequestException) as error:
         raise error
@@ -80,9 +82,10 @@ async def get_club_router(club_id: UUID, db: Session = Depends(get_db)):
         print(traceback.format_exc())
         raise e
 
-@club_router.patch("/clubs/{club_id}", response_model=ClubSchema, status_code=201)
-async def update_club_router(club_id: UUID, club: ClubCreate, current_user: TokenData = Depends(get_current_user), db: Session = Depends(get_db)):
+@club_router.patch("/clubs/{slug}", response_model=ClubSchema, status_code=201)
+async def update_club_router(slug: str, club: ClubCreate, current_user: TokenData = Depends(get_current_user), db: Session = Depends(get_db)):
     try:
+        club_id = get_club_by_slug(slug=slug, db=db)
         return update_club(current_user=current_user, club_id=club_id, updated_attributes=club, db=db)
     except (NotFoundException, ConflictException, BadRequestException) as error:
         raise error
@@ -91,9 +94,10 @@ async def update_club_router(club_id: UUID, club: ClubCreate, current_user: Toke
         raise e
 
 
-@club_router.delete("/clubs/{club_id}", status_code=204)
-async def delete_club_router(club_id: UUID, current_user: TokenData = Depends(get_current_user), db: Session = Depends(get_db)):
+@club_router.delete("/clubs/{slug}", status_code=204)
+async def delete_club_router(slug: str, current_user: TokenData = Depends(get_current_user), db: Session = Depends(get_db)):
     try:
+        club_id = get_club_by_slug(slug=slug, db=db)
         return delete_club(current_user=current_user, db=db, club_id=club_id)
     except (NotFoundException, ConflictException, BadRequestException) as error:
         raise error
@@ -101,15 +105,17 @@ async def delete_club_router(club_id: UUID, current_user: TokenData = Depends(ge
         print(traceback.format_exc())
         raise e
 
-@club_router.patch("/clubs/{club_id}/approve", status_code=201)
-async def approve_club_by_admin_router(club_id: UUID, current_user: TokenData = Depends(get_current_user), db: Session = Depends(get_db)):
+@club_router.patch("/clubs/{slug}/approve", status_code=201)
+async def approve_club_by_admin_router(slug: str, current_user: TokenData = Depends(get_current_user), db: Session = Depends(get_db)):
+    club_id = get_club_by_slug(slug=slug, db=db)
     club = approve_club(current_user=current_user,db=db, club_id=club_id)
     if not club:
         raise NotFoundException(f"Club with id {club_id} not found")
     return {"detail": f"Club {club.name} approved successfully"}
 
-@club_router.patch("/clubs/{club_id}/reject", status_code=201)
-async def reject_club_by_admin_router(club_id: UUID, current_user: TokenData = Depends(get_current_user), db: Session = Depends(get_db)):
+@club_router.patch("/clubs/{slug}/reject", status_code=201)
+async def reject_club_by_admin_router(slug: str, current_user: TokenData = Depends(get_current_user), db: Session = Depends(get_db)):
+    club_id = get_club_by_slug(slug=slug, db=db)
     club = reject_club(current_user=current_user,db=db, club_id=club_id)
     if not club:
         raise NotFoundException(f"Club with id {club_id} not found")

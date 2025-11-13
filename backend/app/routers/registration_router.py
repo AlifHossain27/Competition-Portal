@@ -14,6 +14,7 @@ from app.services.registration_service import (
 )
 from app.db.deps import get_db
 from app.services.user_service import get_current_user
+from app.services.club_service import get_club_by_slug
 from app.exceptions.handler import (
     NotFoundException,
     ConflictException,
@@ -24,54 +25,60 @@ from app.exceptions.handler import (
 
 registration_router = APIRouter()
 
-@registration_router.get("/club/{club_id}/event/{event_id}/registrations", response_model=list[RegistrationSchema], status_code=200)
-async def fetch_all_registrations_router(club_id: UUID, event_id: UUID, db: Session = Depends(get_db), current_user: TokenData = Depends(get_current_user)):
+@registration_router.get("/club/{slug}/event/{event_id}/registrations", response_model=list[RegistrationSchema], status_code=200)
+async def fetch_all_registrations_router(slug: str, event_id: UUID, db: Session = Depends(get_db), current_user: TokenData = Depends(get_current_user)):
     try:
+        club_id = get_club_by_slug(slug=slug, db=db)
         return get_all_registrations(current_user=current_user, db=db, club_id=club_id, event_id=event_id)
     except (NotFoundException, ConflictException, BadRequestException) as error:
         raise error
     except Exception as e:
         raise e
     
-@registration_router.get("/club/{club_id}/event/{event_id}/registrations/{registration_id}", response_model=RegistrationFullSchema, status_code=200)
-async def fetch_registration_router(club_id: UUID, event_id: UUID, registration_id: UUID, db: Session = Depends(get_db), current_user: TokenData = Depends(get_current_user)):
+@registration_router.get("/club/{slug}/event/{event_id}/registrations/{registration_id}", response_model=RegistrationFullSchema, status_code=200)
+async def fetch_registration_router(slug: str, event_id: UUID, registration_id: UUID, db: Session = Depends(get_db), current_user: TokenData = Depends(get_current_user)):
     try:
+        club_id = get_club_by_slug(slug=slug, db=db)
         return get_registration(current_user=current_user, db=db, club_id=club_id, event_id=event_id,registration_id=registration_id)
     except (NotFoundException, ConflictException, BadRequestException) as error:
         raise error
     except Exception as e:
         raise e
     
-@registration_router.patch("/club/{club_id}/event/{event_id}/registrations/{registration_id}/confirm", response_model=RegistrationSchema, status_code=201)
-async def confirm_registration_router(club_id: UUID, event_id: UUID, registration_id: UUID, db: Session = Depends(get_db), current_user: TokenData = Depends(get_current_user)):
+@registration_router.patch("/club/{slug}/event/{event_id}/registrations/{registration_id}/confirm", response_model=RegistrationSchema, status_code=201)
+async def confirm_registration_router(slug: str, event_id: UUID, registration_id: UUID, db: Session = Depends(get_db), current_user: TokenData = Depends(get_current_user)):
     try:
+        club_id = get_club_by_slug(slug=slug, db=db)
         return confirm_registration(current_user=current_user, db=db, club_id=club_id, event_id=event_id, registration_id=registration_id)
     except (NotFoundException, ConflictException, BadRequestException) as error:
         raise error
     except Exception as e:
         raise e
     
-@registration_router.patch("/club/{club_id}/event/{event_id}/registrations/{registration_id}/cancel", response_model=RegistrationSchema, status_code=201)
-async def cancel_registration_router(club_id: UUID, event_id: UUID, registration_id: UUID, db: Session = Depends(get_db), current_user: TokenData = Depends(get_current_user)):
+@registration_router.patch("/club/{slug}/event/{event_id}/registrations/{registration_id}/cancel", response_model=RegistrationSchema, status_code=201)
+async def cancel_registration_router(slug: str, event_id: UUID, registration_id: UUID, db: Session = Depends(get_db), current_user: TokenData = Depends(get_current_user)):
     try:
+        club_id = get_club_by_slug(slug=slug, db=db)
         return cancel_registration(current_user=current_user, db=db, club_id=club_id, event_id=event_id, registration_id=registration_id)
     except (NotFoundException, ConflictException, BadRequestException) as error:
         raise error
     except Exception as e:
         raise e
     
-@registration_router.patch("/club/{club_id}/event/{event_id}/registrations/{registration_id}/payment/{payment_status}", response_model=RegistrationSchema, status_code=201)
-async def update_registration_payment_router(club_id: UUID, event_id: UUID, registration_id: UUID, payment_status: str,db: Session = Depends(get_db), current_user: TokenData = Depends(get_current_user)):
+@registration_router.patch("/club/{slug}/event/{event_id}/registrations/{registration_id}/payment/{payment_status}", response_model=RegistrationSchema, status_code=201)
+async def update_registration_payment_router(slug: str, event_id: UUID, registration_id: UUID, payment_status: str,db: Session = Depends(get_db), current_user: TokenData = Depends(get_current_user)):
     try:
+        club_id = get_club_by_slug(slug=slug, db=db)
         return update_payment_status(current_user=current_user, db=db, club_id=club_id, event_id=event_id, registration_id=registration_id, payment_status=payment_status)
     except (NotFoundException, ConflictException, BadRequestException) as error:
         raise error
     except Exception as e:
         raise e
     
-@registration_router.get("/club/{club_id}/event/{event_id}/registrations/stats", status_code=200)
-async def registration_statistics_router(club_id: UUID, event_id: UUID, db: Session = Depends(get_db), current_user: TokenData = Depends(get_current_user)):
+@registration_router.get("/club/{slug}/event/{event_id}/registrations/stats", status_code=200)
+async def registration_statistics_router(slug: str, event_id: UUID, db: Session = Depends(get_db), current_user: TokenData = Depends(get_current_user)):
     try:
+        club_id = get_club_by_slug(slug=slug, db=db)
         return get_registration_stats(current_user, db, club_id, event_id)
     except (NotFoundException, ConflictException, BadRequestException) as error:
         raise error
