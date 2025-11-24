@@ -1,5 +1,6 @@
 from sqlalchemy import Column, String, DateTime, Enum, func
 from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.orm import relationship
 import uuid
 import enum
 from app.db.database import Base
@@ -20,3 +21,5 @@ class User(Base):
     university_id = Column(String, nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())
+
+    club = relationship("Club", back_populates="owner", foreign_keys="Club.created_by", uselist=False )

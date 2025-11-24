@@ -119,6 +119,8 @@ def get_user_by_uuid(uuid: UUID, db: Session) -> User:
         except ValueError:
             raise BadRequestException("Invalid UUID")
     user = db.query(User).filter(User.id == uuid).first()
+    if not user.club:
+        user.club = None
     if not user:
         raise NotFoundException(f"User with ID {uuid} not found")
     return user
@@ -138,8 +140,6 @@ def update_user(current_user: TokenData, uuid: UUID, updated_attributes: UserUpd
         user.name = updated_attributes.name
     if updated_attributes.university_id is not None:
         user.university_id = updated_attributes.university_id
-    if curr_user.role == UserRoleEnum.admin:
-        user.role = updated_attributes.role
     user.updated_at = datetime.now(tz = timezone.utc)
 
     db.commit()
@@ -175,6 +175,6 @@ def list_users(current_user:TokenData, db: Session) -> list[UserSchema]:
     uuid = current_user.get_id()
     user = get_user_by_uuid(uuid=uuid, db=db)
     if user.role == UserRoleEnum.admin:
-        return db.query(User).all()
+        return db.query(User).filter(User.id != uuid).all()
     else:
         raise UnauthorizedException("Admin user required")

@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
+import { Toaster } from "@/components/ui/sonner"
 import { AuthProvider } from '@/redux/provider'
 
 const geistSans = Geist({
@@ -33,12 +34,11 @@ export default function RootLayout({
         <AuthProvider>
         <main className="flex">
           <div className='flex flex-col w-full'>
-            <Header/>
             <div className='flex-1'>
                 {children}
             </div> 
-            <Footer/>
           </div>
+          <Toaster/>
         </main>
         </AuthProvider>
       </body>

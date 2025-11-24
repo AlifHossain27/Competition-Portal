@@ -11,6 +11,18 @@ import { useDispatch } from 'react-redux'
 import { AppDispatch, useAppSelector } from '@/redux/store'
 import { logIn, logOut } from '@/redux/features/auth-slice'
 
+const navLinks = [
+  { href: "/", label: "Home" },
+  { href: "/events", label: "Events" },
+  { href: "/clubs", label: "Clubs" },
+];
+
+const adminNavLinks = [
+  { href: "/", label: "Home" },
+  { href: "/events", label: "Events" },
+  { href: "/clubs", label: "Clubs" },
+  { href: "/dashboard", label: "Dashboard" },
+];
 
 
 
@@ -62,32 +74,7 @@ export default function Header() {
     })()
   }, [dispatch, API_BASE_URL])
 
-  const navLinks = [
-    { href: "/", label: "Home" },
-    { href: "/events", label: "Events" },
-    { href: "/clubs", label: "Clubs" },
-  ];
-
-  const adminNavLinks = [
-    { href: "/", label: "Home" },
-    { href: "/events", label: "Events" },
-    { href: "/clubs", label: "Clubs" },
-    { href: "/dashboard", label: "Dashboard" },
-  ];
-
-  const regularNavLinks = [
-    { href: "/", label: "Home" },
-    { href: "/events", label: "Events" },
-    { href: "/clubs", label: "Clubs" },
-    { href: "/dashboard", label: "Dashboard" },
-  ];
-
-  const clubNavLinks = [
-    { href: "/", label: "Home" },
-    { href: "/events", label: "Events" },
-    { href: "/clubs", label: "Clubs" },
-    { href: "/dashboard", label: "Dashboard" },
-  ];
+  
 
   const navbarActive = isScrolled || isOpen;
   const linksToShow = isAuth ? adminNavLinks : navLinks;
